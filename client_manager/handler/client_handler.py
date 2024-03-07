@@ -29,7 +29,7 @@ class ClientHandler(socketserver.BaseRequestHandler):
                 break
             conn.sendall(data)
             ClientManager().add_client(Client(conn))
-            self.message_broker.send(client_id=id(conn), content=data.decode())
+            self.message_broker.send_device_message_to_server(client_id=id(conn), content=data.decode())
 
     def finish(self) -> None:
         ClientManager().delete_client_by_connection(self.request)
