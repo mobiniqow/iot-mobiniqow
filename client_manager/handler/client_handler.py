@@ -28,7 +28,10 @@ class ClientHandler(socketserver.BaseRequestHandler):
             if not data:
                 break
             conn.sendall(data)
+            print(data == b'\x00\x00')
+            print(data)
             ClientManager().add_client(Client(conn))
+
             self.message_broker.send_device_message_to_server(client_id=id(conn), content=data.decode())
 
     def finish(self) -> None:
