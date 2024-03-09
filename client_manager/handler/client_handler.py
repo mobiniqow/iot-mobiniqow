@@ -6,9 +6,6 @@ from message_broker.rabbitmq_message_broker import RabbitMQMessageBroker
 
 
 class ClientHandler(socketserver.BaseRequestHandler):
-    """
-        handle client requests
-    """
 
     def __init__(self, request, client_address, server):
 
@@ -28,11 +25,9 @@ class ClientHandler(socketserver.BaseRequestHandler):
             if not data:
                 break
             conn.sendall(data)
-            print(data == b'\x00\x00')
-            print(data)
-            ClientManager().add_client(Client(conn))
-
-            self.message_broker.send_device_message_to_server(client_id=id(conn), content=data.decode())
+            client = Client(conn)
+            ClientManager().add_client(client)
+            self.message_broker.send_message_from_device(client.id,data.decode())
 
     def finish(self) -> None:
         ClientManager().delete_client_by_connection(self.request)
