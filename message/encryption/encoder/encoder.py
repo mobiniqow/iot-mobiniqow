@@ -2,7 +2,7 @@ import abc
 from abc import ABC
 
 
-class MessageEncoder(ABC):
+class Encoder(ABC):
 
     @abc.abstractmethod
     def encode(self, content):

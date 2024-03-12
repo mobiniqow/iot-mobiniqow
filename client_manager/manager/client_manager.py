@@ -9,7 +9,7 @@ class ClientManager(metaclass=SingletonMeta):
 
     def add_client(self, client: Client):
         # self.clients[client.device_id] = client
-        self.id_clients[client.id] = client.device_id
+        self.id_clients[client.client_id] = client.device_id
 
     def delete_client_by_connection(self, connection):
         client_id = f"{connection.getpeername()[0]}:{connection.getpeername()[1]}"

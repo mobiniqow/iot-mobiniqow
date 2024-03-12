@@ -4,6 +4,7 @@ import threading
 import pika
 
 from client_manager.manager.client_manager import ClientManager
+from message.encryption.decoder.rsa_decoder import RSADecoder
 
 
 class RabbitMQMessageBroker(threading.Thread):
@@ -30,8 +31,8 @@ class RabbitMQMessageBroker(threading.Thread):
     def run(self):
         connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
         channel = connection.channel()
-        channel.queue_declare(queue='get_message_from_server', )
-        channel.basic_consume('get_message_from_server', self.get_message_from_server, )
+        channel.queue_declare(queue='send_message_from_server', )
+        channel.basic_consume('send_message_from_server', self.message_from_server, )
         channel.start_consuming()
 
     def server_to_device_data(self, channel, method, properties, body):
@@ -45,14 +46,12 @@ class RabbitMQMessageBroker(threading.Thread):
 
         # print(f"Received message from {result['client_id']}: {result['message']}")
 
-    def get_message_from_server(self, channel, method, properties, body):
-        result = body.decode()
-        result = json.loads(result)
-        # self.client_manager.get_client_by_client_id(result['client_id']).send_message(result['message'])
-        # self.callback(result['client_id'], result['message'])
-
-        if self.client_manager.get_client_by_client_id(result['client_id']):
-            self.client_manager.get_client_by_client_id(result['client_id']).send_message(result['message'])
+    def message_from_server(self, channel, method, properties, body):
+        print("23232323")
+        print(f"body{body}")
+        message_encoder = RSADecoder()
+        content = message_encoder.decode(body)
+        print(f'content {content}')
 
     def serialize_object(self, obj):
         return json.dumps(obj)
