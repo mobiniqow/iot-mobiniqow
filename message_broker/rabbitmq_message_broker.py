@@ -1,5 +1,6 @@
 import json
 import threading
+from binascii import hexlify
 
 import pika
 
@@ -13,11 +14,14 @@ class RabbitMQMessageBroker(threading.Thread):
         connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
         channel = connection.channel()
         channel.queue_declare(queue='send_message_from_device')
+        client = self.client_manager.get_client_by_client_id(client_id)
         message = {
             'client_id': client_id,
+            'relay': client.relay_type,
             'message': str(content),
         }
         message = self.serialize_object(message)
+        print(message)
         channel.basic_publish(exchange='', routing_key='send_message_from_device', body=message)
         connection.close()
 
@@ -47,11 +51,23 @@ class RabbitMQMessageBroker(threading.Thread):
         # print(f"Received message from {result['client_id']}: {result['message']}")
 
     def message_from_server(self, channel, method, properties, body):
-        print("23232323")
-        print(f"body{body}")
+        # try:
         message_encoder = RSADecoder()
         content = message_encoder.decode(body)
-        print(f'content {content}')
-
+        if 'device_id' == content['type']:
+            client = ClientManager().get_client_by_client_id(content['client_id'])
+            if client:
+                client.device_id = content['device_id']
+                client.relay_type = content['relay']
+                ClientManager().add_client(client)
+        if 'update' == content['type']:
+            client = ClientManager().get_client_by_client_id(content['client_id'])
+            print(f"Ashlee Vance {content['state']}")
+            print(f"Ashlee Vance {str.encode(content['state'])}")
+            hex_content = str.encode(content['state'])
+            hex_content = hexlify(hex_content).decode()
+            client.send_message(hex_content)
+        # except Exception as e:
+        #     print(e)
     def serialize_object(self, obj):
         return json.dumps(obj)

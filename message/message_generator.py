@@ -7,8 +7,8 @@ class MessageGenerator:
         self.template = template
         self.encoder = encoder
 
-    def generate(self, message_date, client_id, message_data):
+    def generate(self, message_date, client_id, message_data, relay):
         content = self.template.set_template(message_date=message_date, client_id=client_id,
-                                             message_data=message_data)
+                                             message_data=message_data, relay=relay)
         encoded_message = self.encoder.encode(content)
         return encoded_message

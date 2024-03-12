@@ -4,28 +4,27 @@ from client_manager.manager.Singlethon import SingletonMeta
 
 class ClientManager(metaclass=SingletonMeta):
     def __init__(self, ):
-        self.clients = {}
-        self.id_clients = {}
+        self.device_ids = {}
+        self.client_ids = {}
 
     def add_client(self, client: Client):
         # self.clients[client.device_id] = client
-        self.id_clients[client.client_id] = client.device_id
+        self.client_ids[client.client_id] = client
 
     def delete_client_by_connection(self, connection):
         client_id = f"{connection.getpeername()[0]}:{connection.getpeername()[1]}"
-        if client_id in self.id_clients:
-            client: Client = self.id_clients[client_id]
-            del self.id_clients[client_id]
-            if client and client.device_id in self.clients:
-                del self.clients[client.device_id]
+        if client_id in self.client_ids:
+            client: Client = self.client_ids[client_id]
+            del self.client_ids[client_id]
+            if client and client.device_id in self.device_ids:
+                del self.device_ids[client.device_id]
         connection.close()
 
     def get_client_by_device_id(self, device_id) -> Client:
-        return self.clients[device_id]
+        return self.device_ids[device_id]
 
     def get_client_by_client_id(self, client_id) -> Client:
-        print(client_id, client_id in self.clients)
-        if client_id in self.clients:
-            client = self.clients[client_id]
+        if client_id in self.client_ids:
+            client = self.client_ids[client_id]
             return client
         return None
