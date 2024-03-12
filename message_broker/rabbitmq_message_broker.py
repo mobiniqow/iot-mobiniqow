@@ -51,23 +51,22 @@ class RabbitMQMessageBroker(threading.Thread):
         # print(f"Received message from {result['client_id']}: {result['message']}")
 
     def message_from_server(self, channel, method, properties, body):
-        # try:
-        message_encoder = RSADecoder()
-        content = message_encoder.decode(body)
-        if 'device_id' == content['type']:
-            client = ClientManager().get_client_by_client_id(content['client_id'])
-            if client:
-                client.device_id = content['device_id']
-                client.relay_type = content['relay']
-                ClientManager().add_client(client)
-        if 'update' == content['type']:
-            client = ClientManager().get_client_by_client_id(content['client_id'])
-            print(f"Ashlee Vance {content['state']}")
-            print(f"Ashlee Vance {str.encode(content['state'])}")
-            hex_content = str.encode(content['state'])
-            hex_content = hexlify(hex_content).decode()
-            client.send_message(hex_content)
-        # except Exception as e:
-        #     print(e)
+        try:
+            message_encoder = RSADecoder()
+            content = message_encoder.decode(body)
+            if 'device_id' == content['type']:
+                client = ClientManager().get_client_by_client_id(content['client_id'])
+                if client:
+                    client.device_id = content['device_id']
+                    client.relay_type = content['relay']
+                    ClientManager().add_client(client)
+            if 'update' == content['type']:
+                client = ClientManager().get_client_by_client_id(content['client_id'])
+                a=content['state']
+                hex_content = str.encode(a)
+                hex_content = hexlify(hex_content).decode()
+                client.send_message(hex_content.encode())
+        except Exception as e:
+            print(e)
     def serialize_object(self, obj):
         return json.dumps(obj)
