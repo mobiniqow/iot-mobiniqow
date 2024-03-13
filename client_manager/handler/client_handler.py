@@ -30,7 +30,6 @@ class ClientHandler(socketserver.BaseRequestHandler):
             data = conn.recv(1024)
             if not data:
                 break
-            conn.sendall(data)
             client = Client(conn)
             if not self.client_manager.get_client_by_client_id(client.client_id):
                 self.client_manager.add_client(client)
